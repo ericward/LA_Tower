@@ -39,7 +39,9 @@ for(i in 1:dim(outm)[1]){
   output<-rbind(output,cbind(outm[i,1],fcmean,fch4mean))
   }
 }
-
+colnames(output)<-c('date','FCmean','FCH4mean')
+output<-data.frame(output)
+write.csv(output,'US_LA3_mean_flux_clean_2019_2023.csv',row.names=F)
 outm3<-cbind(outm,outm2)
 colnames(outm3)<-c('date','FCna','FCH4na','FCdayna','FCgood','FCH4good','FCdaygood')
 
