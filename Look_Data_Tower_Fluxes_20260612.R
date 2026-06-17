@@ -1,4 +1,4 @@
-#source("Merge_Data_Tower_CRMS_20260528.R") #uncomment to load data
+source("Merge_Data_Tower_CRMS_20260528.R") #uncomment to load data
 
 ###########la3
 #set NA codes to NA for flux variables
@@ -42,10 +42,10 @@ lines(1:48,nnaleday,col=5,type='o')
 
 for(i in 1:dim(outm)[1]){
     fcflag<-outm[i,2]<13 #threshold missing values for FC
-    fcdayflag<-outm[i,2]<13&outm[i,4]<6  #make conditional on both 1/4 of total and 1/4 of daytime
+    fcdayflag<-outm[i,2]<13&outm[i,4]<7  #make conditional on both 1/4 of total and 1/4 of daytime
     fch4flag<-outm[i,3]<25 #threshold missing values for FCH4
-    leflag<-outm[i,4]<13 #threshold missing values for FC
-    ledayflag<-outm[i,4]<13&outm[i,5]<6  #make conditional on both 1/4 of total and 1/4 of daytime
+    leflag<-outm[i,5]<13 #threshold missing values for FC
+    ledayflag<-outm[i,5]<13&outm[i,6]<7  #make conditional on both 1/4 of total and 1/4 of daytime
     
     fcmean<-NA
     if(fcflag==1&fcdayflag==1) fcmean<-mean(la3_amf$FC[(i*48-47):(i*48)],na.rm=T)
@@ -65,7 +65,7 @@ write.csv(output,'US_LA3_mean_flux_clean_2019_2023.csv',row.names=F)
 outm3<-cbind(outm,outm2)
 colnames(outm3)<-c('date','FCna','FCH4na','FCdayna','LEna','LEdayna','FCgood','FCH4good','FCdaygood','LEgood','LEdaygood')
 
-gooddatn<-matrix(NA,60,7)
+gooddatn<-data.frame(cbind(matrix(NA,60,2),matrix(0,60,5)))
 colnames(gooddatn)<-c('Year','Month','FCdays','FCH4days','FCdaydays','LEdays','LEdaydays')
 gooddatn[,1]<-c(rep(2019,12),rep(2020,12),rep(2021,12),rep(2022,12),rep(2023,12))
 months<-c('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec')
@@ -73,15 +73,22 @@ gooddatn[,2]<-rep(months,5)
 dym<-as.numeric(gooddatn[,1])*100+rep(1:12,5)
 for(i in 1:60){
   xx<-which(floor(outm3[,1]/100)==dym[i])
-  gooddatn[i,3]<-sum(outm3[xx,5])  
-  gooddatn[i,4]<-sum(outm3[xx,6]) 
-  gooddatn[i,5]<-sum(outm3[xx,7]) 
+  gooddatn[i,3]<-as.numeric(sum(outm3[xx,2]))  
+  gooddatn[i,4]<-as.numeric(sum(outm3[xx,3])) 
+  gooddatn[i,5]<-as.numeric(sum(outm3[xx,4]))
+  gooddatn[i,6]<-as.numeric(sum(outm3[xx,5])) 
+  gooddatn[i,7]<-as.numeric(sum(outm3[xx,6]))
+  
 }
-plot(as.numeric(gooddatn[,1])+rep((1:12)/12,5),as.numeric(gooddatn[,3]),type='o')
+plot(as.numeric(gooddatn[,1])+rep((1:12)/12,5),gooddatn[,3],type='o')
 lines(as.numeric(gooddatn[,1])+rep((1:12)/12,5),as.numeric(gooddatn[,4]),col=2,type='o')
 lines(as.numeric(gooddatn[,1])+rep((1:12)/12,5),as.numeric(gooddatn[,5]),col=3,type='o')
-
+lines(as.numeric(gooddatn[,1])+rep((1:12)/12,5),as.numeric(gooddatn[,6]),col=4,type='o')
+lines(as.numeric(gooddatn[,1])+rep((1:12)/12,5),as.numeric(gooddatn[,7]),col=5,type='o')
 ########la2
+
+#limit la2 to data after 2021
+la2_amf<-la2_amf[which(la2_amf[,1]>202100000000),]
 
 #set NA codes to NA
 la2_amf$FC[la2_amf$FC<(-9900)]<-NA
@@ -109,9 +116,11 @@ lines(1:48,nnafch4,col=2)
 
 for(i in 1:dim(outm)[1]){
   fcflag<-outm[i,2]<13 #threshold missing values for FC
+  fcdayflag<-outm[i,2]<13&outm[i,4]<7  #make conditional on both 1/4 of total and 1/4 of daytime
   fch4flag<-outm[i,3]<25 #threshold missing values for FCH4
-  leflag<-outm[i,4]<13 #threshold missing values for FC
-  ledayflag<-outm[i,4]<13&outm[i,5]<6  #make conditional on both 1/4 of total and 1/4 of daytime
+  leflag<-outm[i,5]<13 #threshold missing values for FC
+  ledayflag<-outm[i,5]<13&outm[i,6]<7  #make conditional on both 1/4 of total and 1/4 of daytime
+  
   fcmean<-NA
   if(fcflag==1&fcdayflag==1) fcmean<-mean(la2_amf$FC[(i*48-47):(i*48)],na.rm=T)
   fch4mean<-NA
@@ -126,23 +135,28 @@ for(i in 1:dim(outm)[1]){
 }
 colnames(output)<-c('date','FCmean','FCH4mean','LEmean')
 output<-data.frame(output)
-write.csv(output,'US_LA2_mean_flux_clean_2019_2023.csv',row.names=F)
+write.csv(output,'US_LA2_mean_flux_clean_2021_2023.csv',row.names=F)
 
 outm3<-cbind(outm,outm2)
 colnames(outm3)<-c('date','FCna','FCH4na','FCdayna','LEna','LEdayna','FCgood','FCH4good','FCdaygood','LEgood','LEdaygood')
 
-gooddatn<-matrix(NA,60,7)
+gooddatn<-data.frame(matrix(NA,36,2),matrix(0,36,5))
 colnames(gooddatn)<-c('Year','Month','FCdays','FCH4days','FCdaydays','LEdays','LEdaydays')
-gooddatn[,1]<-c(rep(2019,12),rep(2020,12),rep(2021,12),rep(2022,12),rep(2023,12))
+gooddatn[,1]<-c(rep(2021,12),rep(2022,12),rep(2023,12))
 months<-c('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec')
-gooddatn[,2]<-rep(months,5)
-dym<-as.numeric(gooddatn[,1])*100+rep(1:12,5)
+gooddatn[,2]<-rep(months,3)
+dym<-as.numeric(gooddatn[,1])*100+rep(1:12,3)
 for(i in 1:60){
   xx<-which(floor(outm3[,1]/100)==dym[i])
-  gooddatn[i,3]<-sum(outm3[xx,5])  
-  gooddatn[i,4]<-sum(outm3[xx,6]) 
-  gooddatn[i,5]<-sum(outm3[xx,7]) 
+  gooddatn[i,3]<-as.numeric(sum(outm3[xx,2]))  
+  gooddatn[i,4]<-as.numeric(sum(outm3[xx,3])) 
+  gooddatn[i,5]<-as.numeric(sum(outm3[xx,4]))
+  gooddatn[i,6]<-as.numeric(sum(outm3[xx,5])) 
+  gooddatn[i,7]<-as.numeric(sum(outm3[xx,6]))
+  
 }
-plot(as.numeric(gooddatn[,1])+rep((1:12)/12,5),as.numeric(gooddatn[,3]),type='o')
+plot(as.numeric(gooddatn[,1])+rep((1:12)/12,5),gooddatn[,3],type='o')
 lines(as.numeric(gooddatn[,1])+rep((1:12)/12,5),as.numeric(gooddatn[,4]),col=2,type='o')
 lines(as.numeric(gooddatn[,1])+rep((1:12)/12,5),as.numeric(gooddatn[,5]),col=3,type='o')
+lines(as.numeric(gooddatn[,1])+rep((1:12)/12,5),as.numeric(gooddatn[,6]),col=4,type='o')
+lines(as.numeric(gooddatn[,1])+rep((1:12)/12,5),as.numeric(gooddatn[,7]),col=5,type='o')
