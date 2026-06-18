@@ -98,7 +98,9 @@ la2_amf$LE[la2_amf$LE<(-9900)]<-NA
 
 for(i in 1:(length(la2_amf[,1])/48)){
   xx<-(i*48-47):(i*48)
+  yy<-(i*48-35):(i*48-12)###assumes you start at midnight, goes 600 to 1800 solar time for co2
   nalfc<-sum(is.na(la2_amf$FC[xx]))
+  nalfcday<-sum(is.na(la2_amf$FC[yy]))
   nalfch4<-sum(is.na(la2_amf$FCH4[xx]))
   nalle<-sum(is.na(la2_amf$LE[xx]))
   nalleday<-sum(is.na(la2_amf$LE[yy]))
@@ -140,7 +142,7 @@ write.csv(output,'US_LA2_mean_flux_clean_2021_2023.csv',row.names=F)
 outm3<-cbind(outm,outm2)
 colnames(outm3)<-c('date','FCna','FCH4na','FCdayna','LEna','LEdayna','FCgood','FCH4good','FCdaygood','LEgood','LEdaygood')
 
-gooddatn<-data.frame(matrix(NA,36,2),matrix(0,36,5))
+gooddatn<-data.frame(cbind(matrix(NA,36,2),matrix(0,36,5)))
 colnames(gooddatn)<-c('Year','Month','FCdays','FCH4days','FCdaydays','LEdays','LEdaydays')
 gooddatn[,1]<-c(rep(2021,12),rep(2022,12),rep(2023,12))
 months<-c('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec')
