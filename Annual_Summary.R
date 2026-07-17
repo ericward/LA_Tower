@@ -58,12 +58,12 @@ la2_annual_summary
 
 # Cumulative Summary by Year 
 mwCH4<-16.043 #g/mol
-nmol2gCH4<-1/(10^6*mwCH4)
+nmol2gCH4<-mwCH4/(10^9)
 mwCO2<-44.009 #g/mol
-mmol2gCH4<-1/(10^3*mwCO2)
-d2s<-(24*60*60) #seconds per day
+umol2gCO2<-mwCO2/(10^6)
+d2s<-(24*60*60) #seconds per
 ucCH4<-nmol2gCH4*d2s #nmol m-2 s-1 to g m-2 y-1
-ucCO2<-mmol2gCH4*d2s #nmol m-2 s-1 to g m-2 y-1
+ucCO2<-umol2gCO2*d2s #nmol m-2 s-1 to g m-2 y-1
 
 la3_annual_cumulative <- la3 %>%
   mutate(Year = year(Date)) %>%
